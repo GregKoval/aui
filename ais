@@ -28,7 +28,7 @@ fi
 #SELECT KEYMAP {{{
 select_keymap(){
   print_title "MAPA ZNAKÓW (KEYMAP) - https://wiki.archlinux.org/index.php/KEYMAP"
-  print_info "Wybór KEYMAP zapisany jest w pliku /etc/rc.conf. Określa jaka mapa znaków używana jest w wirtualnych konsolach. Pliki z układem klawiatury dostarczane są przez pakiet kbd."
+  print_info "Wybór MAPY ZNAKÓW zapisany jest w pliku /etc/rc.conf. Określa jaka mapa znaków używana jest w wirtualnych konsolach. Pliki z układem klawiatury dostarczane są przez pakiet kbd."
   OPTION=n
   while [[ $OPTION != y ]]; do
     getkeymap
@@ -128,7 +128,7 @@ create_partition_scheme(){
   }
   print_title "PARTYCJONOWANIE - https://wiki.archlinux.org/index.php/Partitioning"
   print_info "Partycjonowanie dysku twardego pozwala logicznie podzielić dostępną przestrzeń na części, które są dostępne niezależnie od siebie."
-  partition_layout=("Default" "LVM" "LVM+LUKS")
+  partition_layout=("Domyślny" "LVM" "LVM+LUKS")
   PS3="$prompt1"
   echo -e "Wybierz schemat partycji:"
   select OPT in "${partition_layout[@]}"; do
@@ -240,7 +240,7 @@ setup_lvm(){
 format_partitions(){
   print_title "FORMATOWANIE PARTYCJI - https://wiki.archlinux.org/index.php/Format_a_partition"
   print_info "Na tym etapie wybieramy i formatujemy partycję, na której zostanie zainstalowany Archlinux"
-  print_danger "\tWszystkie dane na partycji głównej i SWAP zostaną UTRACONE."
+  print_danger "\tWszystkie dane na partycji głównej i SWAP zostaną \nUTRACONE."
   i=0
 
   block_list=(`lsblk | grep 'part\|lvm' | awk '{print substr($1,3)}'`)
@@ -263,9 +263,9 @@ format_partitions(){
 
   # partitions based on boot system
   if [[ $UEFI -eq 1 ]]; then
-    partition_name=("root" "EFI" "swap" "inna")
+    partition_name=("root" "EFI" "swap" "another")
   else
-    partition_name=("root" "swap" "inna")
+    partition_name=("root" "swap" "another")
   fi
 
   select_filesystem(){
