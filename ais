@@ -27,22 +27,22 @@ fi
 #ARCHLINUX INSTALL SCRIPTS MODE {{{
 #SELECT KEYMAP {{{
 select_keymap(){
-  print_title "KEYMAP - https://wiki.archlinux.org/index.php/KEYMAP"
-  print_info "The KEYMAP variable is specified in the /etc/rc.conf file. It defines what keymap the keyboard is in the virtual consoles. Keytable files are provided by the kbd package."
+  print_title "MAPA ZNAKÓW (KEYMAP) - https://wiki.archlinux.org/index.php/KEYMAP"
+  print_info "Wybór KEYMAP zapisany jest w pliku /etc/rc.conf. Określa jaka mapa znaków używana jest w wirtualnych konsolach. Pliki z układem klawiatury dostarczane są przez pakiet kbd."
   OPTION=n
   while [[ $OPTION != y ]]; do
     getkeymap
-    read_input_text "Confirm keymap: $KEYMAP"
+    read_input_text "Potwierdź mapę znaków: $KEYMAP"
   done
   loadkeys $KEYMAP
 }
 #}}}
 #DEFAULT EDITOR {{{
 select_editor(){
-  print_title "DEFAULT EDITOR"
+  print_title "DOMYŚLNY EDYTOR"
   editors_list=("emacs" "nano" "vi" "vim" "zile");
   PS3="$prompt1"
-  echo -e "Select editor\n"
+  echo -e "Wybierz edytor\n"
   select EDITOR in "${editors_list[@]}"; do
     if contains_element "$EDITOR" "${editors_list[@]}"; then
       package_install "$EDITOR"
@@ -56,11 +56,11 @@ select_editor(){
 #MIRRORLIST {{{
 configure_mirrorlist(){
   local countries_code=("AU" "AT" "BY" "BE" "BR" "BG" "CA" "CL" "CN" "CO" "CZ" "DK" "EE" "FI" "FR" "DE" "GR" "HU" "IN" "IE" "IL" "IT" "JP" "KZ" "KR" "LV" "LU" "MK" "NL" "NC" "NZ" "NO" "PL" "PT" "RO" "RU" "RS" "SG" "SK" "ZA" "ES" "LK" "SE" "CH" "TW" "TR" "UA" "GB" "US" "UZ" "VN")
-  local countries_name=("Australia" "Austria" "Belarus" "Belgium" "Brazil" "Bulgaria" "Canada" "Chile" "China" "Colombia" "Czech Republic" "Denmark" "Estonia" "Finland" "France" "Germany" "Greece" "Hungary" "India" "Ireland" "Israel" "Italy" "Japan" "Kazakhstan" "Korea" "Latvia" "Luxembourg" "Macedonia" "Netherlands" "New Caledonia" "New Zealand" "Norway" "Poland" "Portugal" "Romania" "Russian" "Serbia" "Singapore" "Slovakia" "South Africa" "Spain" "Sri Lanka" "Sweden" "Switzerland" "Taiwan" "Turkey" "Ukraine" "United Kingdom" "United States" "Uzbekistan" "Viet Nam")
+  local countries_name=("Australia" "Austria" "Belarus" "Belgium" "Brazil" "Bulgaria" "Canada" "Chile" "China" "Colombia" "Czech Republic" "Denmark" "Estonia" "Finland" "France" "Germany" "Greece" "Hungary" "India" "Ireland" "Israel" "Italy" "Japan" "Kazakhstan" "Korea" "Latvia" "Luxembourg" "Macedonia" "Netherlands" "New Caledonia" "New Zealand" "Norway" "Polska" "Portugal" "Romania" "Russian" "Serbia" "Singapore" "Slovakia" "South Africa" "Spain" "Sri Lanka" "Sweden" "Switzerland" "Taiwan" "Turkey" "Ukraine" "United Kingdom" "United States" "Uzbekistan" "Viet Nam")
   country_list(){
     #`reflector --list-countries | sed 's/[0-9]//g' | sed 's/^/"/g' | sed 's/,.*//g' | sed 's/ *$//g'  | sed 's/$/"/g' | sed -e :a -e '$!N; s/\n/ /; ta'`
     PS3="$prompt1"
-    echo "Select your country:"
+    echo "Wybierz swój kraj:"
     select country_name in "${countries_name[@]}"; do
       if contains_element "$country_name" "${countries_name[@]}"; then
         contry_code=${countries_code[$(( $REPLY - 1 ))]}
@@ -71,11 +71,11 @@ configure_mirrorlist(){
     done
   }
   print_title "MIRRORLIST - https://wiki.archlinux.org/index.php/Mirrors"
-  print_info "This option is a guide to selecting and configuring your mirrors, and a listing of current available mirrors."
+  print_info "Ta opcja to przewodnik po wyborze i konfiguracji serwerów lustrzanych, oraz wyświetla ich listę."
   OPTION=n
   while [[ $OPTION != y ]]; do
     country_list
-    read_input_text "Confirm country: $country_name"
+    read_input_text "Potwierdź swój kraj: $country_name"
   done
 
   url="https://www.archlinux.org/mirrorlist/?country=${contry_code}&use_mirror_status=on"
@@ -88,12 +88,12 @@ configure_mirrorlist(){
 
   # Backup and replace current mirrorlist file (if new file is non-zero)
   if [[ -s ${tmpfile} ]]; then
-   { echo " Backing up the original mirrorlist..."
+   { echo " Tworzenie kopii zapasowej oryginalnych mirrorów..."
      mv -i /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.orig; } &&
-   { echo " Rotating the new list into place..."
+   { echo " Zamiana nowej listy w miejsce..."
      mv -i ${tmpfile} /etc/pacman.d/mirrorlist; }
   else
-    echo " Unable to update, could not download list."
+    echo " Nie można zaktualizować, nie może pobrać listy."
   fi
   # allow global read access (required for non-root yaourt execution)
   chmod +r /etc/pacman.d/mirrorlist
@@ -116,7 +116,7 @@ create_partition_scheme(){
   select_device(){
     devices_list=(`lsblk -d | awk '{print "/dev/" $1}' | grep 'sd\|hd\|vd'`);
     PS3="$prompt1"
-    echo -e "Select partition:\n"
+    echo -e "Wybór partycji:\n"
     select device in "${devices_list[@]}"; do
       if contains_element "${device}" "${devices_list[@]}"; then
         break
@@ -127,10 +127,10 @@ create_partition_scheme(){
     BOOT_DISK=$device
   }
   print_title "https://wiki.archlinux.org/index.php/Partitioning"
-  print_info "Partitioning a hard drive allows one to logically divide the available space into sections that can be accessed independently of one another."
+  print_info "Partycjonowanie dysku twardego pozwala logicznie podzielić dostępną przestrzeń na części, które są dostępne niezależnie od siebie."
   partition_layout=("Default" "LVM" "LVM+LUKS")
   PS3="$prompt1"
-  echo -e "Select partition scheme:"
+  echo -e "Wybierz schemat partycji:"
   select OPT in "${partition_layout[@]}"; do
     case "$REPLY" in
       1)
@@ -157,7 +157,7 @@ create_partition_scheme(){
 create_partition(){
   apps_list=("cfdisk" "cgdisk" "fdisk" "gdisk" "parted");
   PS3="$prompt1"
-  echo -e "Select partition program:"
+  echo -e "Wybierz program partycjonujący:"
   select OPT in "${apps_list[@]}"; do
     if contains_element "$OPT" "${apps_list[@]}"; then
       select_device
@@ -179,11 +179,11 @@ create_partition(){
 #SETUP LUKS {{{
 setup_luks(){
   print_title "LUKS - https://wiki.archlinux.org/index.php/LUKS"
-  print_info "The Linux Unified Key Setup or LUKS is a disk-encryption specification created by Clemens Fruhwirth and originally intended for Linux."
-  print_danger "\tDo not use this for boot partitions"
+  print_info "Linux Unified Key Setup albo LUKS jest specyfikacją szyfrowania dysków stworzoną przez Clemensa Fruhwirtha i pierwotnie przeznaczoną dla Linux."
+  print_danger "\tNie używaj tego dla partycji rozruchowej"
   block_list=(`lsblk | grep 'part' | awk '{print "/dev/" substr($1,3)}'`)
   PS3="$prompt1"
-  echo -e "Select partition:"
+  echo -e "Wybierz partycję:"
   select OPT in "${block_list[@]}"; do
     if contains_element "$OPT" "${block_list[@]}"; then
       cryptsetup luksFormat $OPT
@@ -202,15 +202,15 @@ setup_luks(){
 #SETUP LVM {{{
 setup_lvm(){
   print_title "LVM - https://wiki.archlinux.org/index.php/LVM"
-  print_info "LVM is a logical volume manager for the Linux kernel; it manages disk drives and similar mass-storage devices. "
-  print_warning "Last partition will take 100% of free space left"
+  print_info "LVM to menedżer woluminów logicznych dla jądra Linux; zarządza sterownikami dysków oraz podobnymi urządzeniami pamięci masowej. "
+  print_warning "Ostatnia partycja zajmnie 100% wolnej, dostępnej przestrzeni"
   if [[ $LUKS -eq 1 ]]; then
     pvcreate /dev/mapper/crypt
     vgcreate lvm /dev/mapper/crypt
   else
     block_list=(`lsblk | grep 'part' | awk '{print "/dev/" substr($1,3)}'`)
     PS3="$prompt1"
-    echo -e "Select partition:"
+    echo -e "Wybierz partycję:"
     select OPT in "${block_list[@]}"; do
       if contains_element "$OPT" "${block_list[@]}"; then
         pvcreate $OPT
@@ -221,14 +221,14 @@ setup_lvm(){
       fi
     done
   fi
-  read -p "Enter number of partitions [ex: 2]: " number_partitions
+  read -p "Wybierz liczbę partycji [np: 2]: " number_partitions
   i=1
   while [[ $i -le $number_partitions ]]; do
-    read -p "Enter $iª partition name [ex: home]: " partition_name
+    read -p "Wpisz $iª nazwę partycji [np: home]: " partition_name
     if [[ $i -eq $number_partitions ]]; then
       lvcreate -l 100%FREE lvm -n ${partition_name}
     else
-      read -p "Enter $iª partition size [ex: 25G, 200M]: " partition_size
+      read -p "Podaj $iª rozmiar partycji [np: 25G, 200M]: " partition_size
       lvcreate -L ${partition_size} lvm -n ${partition_name}
     fi
     i=$(( i + 1 ))
@@ -239,15 +239,15 @@ setup_lvm(){
 #SELECT|FORMAT PARTITIONS {{{
 format_partitions(){
   print_title "https://wiki.archlinux.org/index.php/Format_a_partition"
-  print_info "This step will select and format the selected partiton where the archlinux will be installed"
-  print_danger "\tAll data on the ROOT and SWAP partition will be LOST."
+  print_info "Na tym etapie wybieramy i formatujemy partycję, na której zostanie zainstalowany Archlinux"
+  print_danger "\tWszystkie dane na partycji głównej i SWAP zostaną UTRACONE."
   i=0
 
   block_list=(`lsblk | grep 'part\|lvm' | awk '{print substr($1,3)}'`)
 
   # check if there is no partition
   if [[ ${#block_list[@]} -eq 0 ]]; then
-    echo "No partition founded"
+    echo "Nie znaleziono partycji"
     exit 0
   fi
 
@@ -271,7 +271,7 @@ format_partitions(){
   select_filesystem(){
     filesystems_list=( "btrfs" "ext2" "ext3" "ext4" "f2fs" "jfs" "nilfs2" "ntfs" "vfat" "xfs");
     PS3="$prompt1"
-    echo -e "Select filesystem:\n"
+    echo -e "Wybierz system plików:\n"
     select filesystem in "${filesystems_list[@]}"; do
       if contains_element "${filesystem}" "${filesystems_list[@]}"; then
         break
@@ -290,7 +290,7 @@ format_partitions(){
   }
 
   format_partition(){
-    read_input_text "Confirm format $1 partition"
+    read_input_text "Potwierdź formatowanie $1 partycji"
     if [[ $OPTION == y ]]; then
       [[ -z $3 ]] && select_filesystem || filesystem=$3
       mkfs.${filesystem} $1 \
@@ -304,7 +304,7 @@ format_partitions(){
   }
 
   format_swap_partition(){
-    read_input_text "Confirm format $1 partition"
+    read_input_text "Potwierdź formatowanie $1 partycji"
     if [[ $OPTION == y ]]; then
       mkswap $1
       swapon $1
@@ -315,7 +315,7 @@ format_partitions(){
   create_swap(){
     swap_options=("partition" "file" "skip");
     PS3="$prompt1"
-    echo -e "Select ${BYellow}${partition_name[i]}${Reset} filesystem:\n"
+    echo -e "Wybierz ${BYellow}${partition_name[i]}${Reset} system plików:\n"
     select OPT in "${swap_options[@]}"; do
       case "$REPLY" in
         1)
@@ -351,17 +351,17 @@ format_partitions(){
 
   check_mountpoint(){
     if mount | grep $2; then
-      echo "Successfully mounted"
+      echo "Montowanie udane"
       disable_partition "$1"
     else
-      echo "WARNING: Not Successfully mounted"
+      echo "UWAGA: Nie zamontowano pomyślnie"
     fi
   }
 
   set_efi_partition(){
     efi_options=("/boot/efi" "/boot")
     PS3="$prompt1"
-    echo -e "Select EFI mountpoint:\n"
+    echo -e "Wybierz punkt montowania EFI:\n"
     select EFI_DISK in "${efi_options[@]}"; do
       if contains_element "${EFI_DISK}" "${efi_options[@]}"; then
         break
@@ -376,7 +376,7 @@ format_partitions(){
     if [[ ${partition_name[i]} == swap ]]; then
       create_swap
     else
-      echo -e "Select ${BYellow}${partition_name[i]}${Reset} partition:\n"
+      echo -e "Wybierz ${BYellow}${partition_name[i]}${Reset} partycję:\n"
       select partition in "${partitions_list[@]}"; do
         #get the selected number - 1
         partition_number=$(( $REPLY - 1 ))
@@ -389,7 +389,7 @@ format_partitions(){
               ;;
             EFI)
               set_efi_partition
-              read_input_text "Format ${partition} partition"
+              read_input_text "Formatowanie ${partition} partycji"
               if [[ $OPTION == y ]]; then
                 format_partition "${partition}" "${MOUNTPOINT}${EFI_DISK}" vfat
               else
@@ -399,14 +399,14 @@ format_partitions(){
               fi
               ;;
             another)
-              read -p "Mountpoint [ex: /home]:" directory
+              read -p "Punkt montowania [np: /home]:" directory
               [[ $directory == "/boot" ]] && BOOT_DISK=`echo ${partition} | sed 's/[0-9]//'`
               select_filesystem
-              read_input_text "Format ${partition} partition"
+              read_input_text "Formatowanie ${partition} partycji"
               if [[ $OPTION == y ]]; then
                 format_partition "${partition}" "${MOUNTPOINT}${directory}" "${filesystem}"
               else
-                read_input_text "Confirm fs="${filesystem}" part="${partition}" dir="${directory}""
+                read_input_text "Potwierdź fs="${filesystem}" part="${partition}" dir="${directory}""
                 if [[ $OPTION == y ]]; then
                   mkdir -p ${MOUNTPOINT}${directory}
                   mount -t ${filesystem} ${partition} ${MOUNTPOINT}${directory}
@@ -425,7 +425,7 @@ format_partitions(){
     if [[ ${#partitions_list[@]} -eq 0 && ${partition_name[i]} != swap ]]; then
       break
     elif [[ ${partition_name[i]} == another ]]; then
-      read_input_text "Configure more partitions"
+      read_input_text "Skonfiguruj więcej partycji"
       [[ $OPTION != y ]] && break
     fi
   done
@@ -434,8 +434,8 @@ format_partitions(){
 #}}}
 #INSTALL BASE SYSTEM {{{
 install_base_system(){
-  print_title "INSTALL BASE SYSTEM"
-  print_info "Using the pacstrap script we install the base system. The base-devel package group will be installed also."
+  print_title "INSTALACJA SYSTEMU BAZOWEGO"
+  print_info "Używając skryptu pacstrap zainstalujemy system bazowy. Pakiety grupy base-devel także zostaną zainstalowane."
   pacstrap ${MOUNTPOINT} base base-devel parted btrfs-progs ntp
   WIRELESS_DEV=`ip link | grep wlp | awk '{print $2}'| sed 's/://'`
   if [[ -n $WIRELESS_DEV ]]; then
@@ -452,7 +452,7 @@ configure_keymap(){
 #CONFIGURE FSTAB {{{
 configure_fstab(){
   print_title "FSTAB - https://wiki.archlinux.org/index.php/Fstab"
-  print_info "The /etc/fstab file contains static filesystem information. It defines how storage devices and partitions are to be mounted and integrated into the overall system. It is read by the mount command to determine which options to use when mounting a specific partition or partition."
+  print_info "Plik /etc/fstab zawiera informacje o statycznym systemie plików. Określa on jak urządzenia pamięci masowej i partycje mają być zamontowane i zintegrowane z systemem ogólnym. Jest on odczytywany przez polecenie mount, aby określić, których opcji użyć przy montowaniu konkretnej partycji."
   if [[ ! -f ${MOUNTPOINT}/etc/fstab.aui ]]; then
     cp ${MOUNTPOINT}/etc/fstab ${MOUNTPOINT}/etc/fstab.aui
   else
@@ -465,7 +465,7 @@ configure_fstab(){
   fi
 
   PS3="$prompt1"
-  echo -e "Configure fstab based on:"
+  echo -e "Konfiguruj fstab bazujący na:"
   select OPT in "${fstab_list[@]}"; do
     case "$REPLY" in
       1) genfstab -p ${MOUNTPOINT} >> ${MOUNTPOINT}/etc/fstab ;;
@@ -480,7 +480,7 @@ configure_fstab(){
     esac
     [[ -n $OPT ]] && break
   done
-  echo "Review your fstab"
+  echo "Zweryfikuj swój fstab"
   [[ -f ${MOUNTPOINT}/swapfile ]] && sed -i "s/\\${MOUNTPOINT}//" ${MOUNTPOINT}/etc/fstab
   pause_function
   $EDITOR ${MOUNTPOINT}/etc/fstab
@@ -489,8 +489,8 @@ configure_fstab(){
 #CONFIGURE HOSTNAME {{{
 configure_hostname(){
   print_title "HOSTNAME - https://wiki.archlinux.org/index.php/HOSTNAME"
-  print_info "A host name is a unique name created to identify a machine on a network.Host names are restricted to alphanumeric characters.\nThe hyphen (-) can be used, but a host name cannot start or end with it. Length is restricted to 63 characters."
-  read -p "Hostname [ex: archlinux]: " host_name
+  print_info "Nazwa hosta to unikalna nazwa utworzona w celu identyfikacji urządzenia w sieci. Nazwy hostów są ograniczone do znaków alfanumerycznych.\nMyślnik (-) może być użyty, ale nazwa hosta nie może się nim zacząć ani zakończyć. Długość jest ograniczona do 63 znaków."
+  read -p "Nazwa hosta [np: archlinux]: " host_name
   echo "$host_name" > ${MOUNTPOINT}/etc/hostname
   if [[ ! -f ${MOUNTPOINT}/etc/hosts.aui ]]; then
     cp ${MOUNTPOINT}/etc/hosts ${MOUNTPOINT}/etc/hosts.aui
@@ -504,11 +504,11 @@ configure_hostname(){
 #CONFIGURE TIMEZONE {{{
 configure_timezone(){
   print_title "TIMEZONE - https://wiki.archlinux.org/index.php/Timezone"
-  print_info "In an operating system the time (clock) is determined by four parts: Time value, Time standard, Time Zone, and DST (Daylight Saving Time if applicable)."
+  print_info "W systemie operacyjnym czas (zegar) jest określany przez cztery części: Wartość czasu, Czas standardowy (godzina), Strefa Czasowa, oraz DTS (Daylight Saving Time - Okresowe Zmiany Czasu) jeśli jest używany."
   OPTION=n
   while [[ $OPTION != y ]]; do
     settimezone
-    read_input_text "Confirm timezone (${ZONE}/${SUBZONE})"
+    read_input_text "Potwierdź strefę czasową (${ZONE}/${SUBZONE})"
   done
   arch_chroot "ln -s /usr/share/zoneinfo/${ZONE}/${SUBZONE} /etc/localtime"
 }
@@ -516,7 +516,7 @@ configure_timezone(){
 #CONFIGURE HARDWARECLOCK {{{
 configure_hardwareclock(){
   print_title "HARDWARE CLOCK TIME - https://wiki.archlinux.org/index.php/Internationalization"
-  print_info "This is set in /etc/adjtime. Set the hardware clock mode uniformly between your operating systems on the same machine. Otherwise, they will overwrite the time and cause clock shifts (which can cause time drift correction to be miscalibrated)."
+  print_info "Jest on ustawiany w /etc/adjtime. Ustaw tryb zegara sprzętowego, aby ujednolicić czas między systemami operacyjnymi na tym samym sprzęcie. W innym przypadku, mogą one nadpisywać czas i powodować zmiany zegara (może to powodować, że korekta zmiany czasu może być rozregulowana)."
   hwclock_list=('UTC' 'Localtime');
   PS3="$prompt1"
   select OPT in "${hwclock_list[@]}"; do
@@ -534,11 +534,11 @@ configure_hardwareclock(){
 #CONFIGURE LOCALE {{{
 configure_locale(){
   print_title "LOCALE - https://wiki.archlinux.org/index.php/Locale"
-  print_info "Locales are used in Linux to define which language the user uses. As the locales define the character sets being used as well, setting up the correct locale is especially important if the language contains non-ASCII characters."
+  print_info "Ustawienia regionalne w Linuksie są używane w celu określenia, którego języka używa użytkownik. Ponieważ ustawienia regionalne definiują również jakie zestawy znaków są używane, ustawienie poprawnego locale jest szczególnie ważne, jeśli język zawiera znaki spoza ASCII."
   OPTION=n
   while [[ $OPTION != y ]]; do
     setlocale
-    read_input_text "Confirm locale ($LOCALE)"
+    read_input_text "Potwierdź ustawienia regionalne ($LOCALE)"
   done
   echo 'LANG="'$LOCALE_UTF8'"' > ${MOUNTPOINT}/etc/locale.conf
   arch_chroot "sed -i '/'${LOCALE_UTF8}'/s/^#//' /etc/locale.gen"
@@ -548,7 +548,7 @@ configure_locale(){
 #CONFIGURE MKINITCPIO {{{
 configure_mkinitcpio(){
   print_title "MKINITCPIO - https://wiki.archlinux.org/index.php/Mkinitcpio"
-  print_info "mkinitcpio is a Bash script used to create an initial ramdisk environment."
+  print_info "mkinitcpio to skrypt Basha używany do utworzenia środowiska z obrazu dysku uruchomieniowego (initial RAM disk)."
   [[ $LUKS -eq 1 ]] && sed -i '/^HOOK/s/block/block keymap encrypt/' ${MOUNTPOINT}/etc/mkinitcpio.conf
   [[ $LVM -eq 1 ]] && sed -i '/^HOOK/s/filesystems/lvm2 filesystems/' ${MOUNTPOINT}/etc/mkinitcpio.conf
   arch_chroot "mkinitcpio -p linux"
@@ -557,17 +557,17 @@ configure_mkinitcpio(){
 #INSTALL BOOTLOADER {{{
 install_bootloader(){
   print_title "BOOTLOADER - https://wiki.archlinux.org/index.php/Bootloader"
-  print_info "The boot loader is responsible for loading the kernel and initial RAM disk before initiating the boot process."
-  print_warning "\tROOT Partition: ${ROOT_DISK}"
+  print_info "Program rozruchowy jest odpowiedzialny za ładowanie jądra i initial RAM disk przed rozpoczęciem procesu rozruchu."
+  print_warning "\tPartycja główna: ${ROOT_DISK}"
   if [[ $UEFI -eq 1 ]]; then
-    print_warning "\tUEFI Mode Detected"
+    print_warning "\tWykryty tryb UEFI"
     bootloaders_list=("Syslinux" "Gummiboot" "Skip")
   else
-    print_warning "\tBIOS Mode Detected"
+    print_warning "\tWykryty tryb BIOS"
     bootloaders_list=("Syslinux" "Skip")
   fi
   PS3="$prompt1"
-  echo -e "Install bootloader:\n"
+  echo -e "Zainstaluj program rozruchowy:\n"
   select bootloader in "${bootloaders_list[@]}"; do
     case "$REPLY" in
       1)
@@ -594,10 +594,10 @@ configure_bootloader(){
   case $bootloader in
     Syslinux)
       print_title "SYSLINUX - https://wiki.archlinux.org/index.php/Syslinux"
-      print_info "Syslinux is a collection of boot loaders capable of booting from hard drives, CDs, and over the network via PXE. It supports the fat, ext2, ext3, ext4, and btrfs file systems."
+      print_info "Syslinux to zestaw programów rozruchowych umożliwiających rozruch z dysków twardych, CD, oraz poprzez sieć via PXE. Wspiera systemy plików: fat, ext2, ext3, ext4, oraz btrfs."
       syslinux_install_mode=("[MBR] Automatic" "[PARTITION] Automatic" "Manual")
       PS3="$prompt1"
-      echo -e "Syslinux Install:\n"
+      echo -e "Instalacja Syslinux:\n"
       select OPT in "${syslinux_install_mode[@]}"; do
         case "$REPLY" in
           1)
@@ -609,7 +609,7 @@ configure_bootloader(){
             else
               sed -i "s/sda[0-9]/${ROOT_PART}/g" ${MOUNTPOINT}/boot/syslinux/syslinux.cfg
             fi
-            print_warning "The partition in question needs to be whatever you have as / (root), not /boot."
+            print_warning "Partycją w pytaniu jest ta, którą masz jako / (root), a nie /boot."
             pause_function
             $EDITOR ${MOUNTPOINT}/boot/syslinux/syslinux.cfg
             break
@@ -623,13 +623,13 @@ configure_bootloader(){
             else
               sed -i "s/sda[0-9]/${ROOT_PART}/g" ${MOUNTPOINT}/boot/syslinux/syslinux.cfg
             fi
-            print_warning "The partition in question needs to be whatever you have as / (root), not /boot."
+            print_warning "Partycją w pytaniu jest ta, którą masz jako / (root), a nie /boot."
             pause_function
             $EDITOR ${MOUNTPOINT}/boot/syslinux/syslinux.cfg
             break
             ;;
           3)
-            print_info "Your boot partition, on which you plan to install Syslinux, must contain a FAT, ext2, ext3, ext4, or Btrfs file system. You should install it on a mounted directory, not a /dev/sdXY partition. You do not have to install it on the root directory of a file system, e.g., with partition /dev/sda1 mounted on /boot you can install Syslinux in the syslinux directory"
+            print_info "Twoja partycja rozruchowa, na której masz zamiar zainstalować Syslinux, musi być zbudowana na systemie plików FAT, ext2, ext3, ext4, albo Btrfs. Należy zainstalować go na zamontowanym katalogu, a nie partycji /dev/sdXY. Nie musisz instalować go w katalogu głównym systemu plików, np. z partycją       /dev/sda1 zamontowaną w /boot możesz zainstalować Syslinux w katalogu syslinuksa"
             echo -e $prompt3
             print_warning "mkdir /boot/syslinux\nextlinux --install /boot/syslinux "
             arch-chroot ${MOUNTPOINT}
@@ -643,16 +643,16 @@ configure_bootloader(){
       ;;
     Gummiboot)
       print_title "GUMMIBOOT - https://wiki.archlinux.org/index.php/Gummiboot"
-      print_info "Gummiboot is a UEFI boot manager written by Kay Sievers and Harald Hoyer. It is simple to configure, but can only start EFI executables, the Linux kernel EFISTUB, UEFI Shell, grub.efi, and such."
-      print_warning "\tGummiboot heavily suggests that /boot is mounted to the EFI partition, not /boot/efi, in order to simplify updating and configuration."
+      print_info "Gummiboot jest menedżerem rozruchowym UEFI napisanym przez Kaya Sieversa i Haralda Hoyera. Jest prosty w konfiguracji, ale potrafi uruchomić tylko pliki wykonalne EFI, Linux kernel EFISTUB, UEFI Shell, grub.efi i podobne."
+      print_warning "\tGummiboot mocno zaznacza, że /boot jest zamontowana do partycji EFI, a nie /boot/efi,  w celu uproszczenia aktualizacji i konfiguracji."
       gummiboot_install_mode=("Automatic" "Manual")
       PS3="$prompt1"
-      echo -e "Gummiboot install:\n"
+      echo -e "Instalacja Gummiboot:\n"
       select OPT in "${gummiboot_install_mode[@]}"; do
         case "$REPLY" in
           1)
             arch_chroot "gummiboot install"
-            print_warning "Please check your .conf file"
+            print_warning "Proszę sprawdzić plik .conf"
             partuuid=`blkid -s PARTUUID ${ROOT_DISK} | awk '{print $2}' | sed 's/"//g' | sed 's/^.*=//'`
             echo -e "title\tArch Linux\nlinux\t/vmlinuz-linux\ninitrd\t/initramfs-linux.img\noptions\troot=PARTUUID=${partuuid} rw" > ${MOUNTPOINT}/boot/loader/entries/arch.conf
             echo -e "default  arch\ntimeout  5" > ${MOUNTPOINT}/boot/loader/loader.conf
@@ -677,19 +677,19 @@ configure_bootloader(){
 #}}}
 #ROOT PASSWORD {{{
 root_password(){
-  print_title "ROOT PASSWORD"
-  print_warning "Enter your new root password"
+  print_title "HASŁO ADMINISTRATORA"
+  print_warning "Wpisz swoje nowe hasło administratora"
   arch_chroot "passwd"
   pause_function
 }
 #}}}
 #FINISH {{{
 finish(){
-  print_title "INSTALL COMPLETED"
+  print_title "INSTALACJA ZAKOŃCZONA"
   #COPY AUI TO ROOT FOLDER IN THE NEW SYSTEM
-  print_warning "\nA copy of the AUI will be placed in /root directory of your new system"
+  print_warning "\nKopia AUI będzie przeniesiona do katalogu /root w twoim nowym systemie"
   cp -R `pwd` ${MOUNTPOINT}/root
-  read_input_text "Reboot system"
+  read_input_text "Zrestartuj system"
   if [[ $OPTION == y ]]; then
     umount_partitions
     reboot
@@ -699,7 +699,7 @@ finish(){
 #}}}
 
 print_title "https://wiki.archlinux.org/index.php/Arch_Install_Scripts"
-print_info "The Arch Install Scripts are a set of Bash scripts that simplify Arch installation."
+print_info "Arch Install Scripts jest zestawem skryptów Basha, które upraszczają instalację Archa."
 pause_function
 check_boot_system
 check_connection
@@ -707,7 +707,7 @@ pacman -Sy
 while true
 do
   print_title "ARCHLINUX ULTIMATE INSTALL - https://github.com/helmuthdu/aui"
-  echo " 1) $(mainmenu_item "${checklist[1]}" "Select Keymap")"
+  echo " 1) $(mainmenu_item "${checklist[1]}" "Wybierz Mapę Znaków")"
   echo " 2) $(mainmenu_item "${checklist[2]}" "Select Editor")"
   echo " 3) $(mainmenu_item "${checklist[3]}" "Configure Mirrorlist")"
   echo " 4) $(mainmenu_item "${checklist[4]}" "Create Partition")"
