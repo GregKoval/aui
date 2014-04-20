@@ -70,7 +70,7 @@ configure_mirrorlist(){
       fi
     done
   }
-  print_title "MIRRORLIST - https://wiki.archlinux.org/index.php/Mirrors"
+  print_title "LISTA MIRRORÓW - https://wiki.archlinux.org/index.php/Mirrors"
   print_info "Ta opcja to przewodnik po wyborze i konfiguracji serwerów lustrzanych, oraz wyświetla ich listę."
   OPTION=n
   while [[ $OPTION != y ]]; do
@@ -126,7 +126,7 @@ create_partition_scheme(){
     done
     BOOT_DISK=$device
   }
-  print_title "https://wiki.archlinux.org/index.php/Partitioning"
+  print_title "PARTYCJONOWANIE - https://wiki.archlinux.org/index.php/Partitioning"
   print_info "Partycjonowanie dysku twardego pozwala logicznie podzielić dostępną przestrzeń na części, które są dostępne niezależnie od siebie."
   partition_layout=("Default" "LVM" "LVM+LUKS")
   PS3="$prompt1"
@@ -221,7 +221,7 @@ setup_lvm(){
       fi
     done
   fi
-  read -p "Wybierz liczbę partycji [np: 2]: " number_partitions
+  read -p "Wybierz numer partycji [np: 2]: " number_partitions
   i=1
   while [[ $i -le $number_partitions ]]; do
     read -p "Wpisz $iª nazwę partycji [np: home]: " partition_name
@@ -238,7 +238,7 @@ setup_lvm(){
 #}}}
 #SELECT|FORMAT PARTITIONS {{{
 format_partitions(){
-  print_title "https://wiki.archlinux.org/index.php/Format_a_partition"
+  print_title "FORMATOWANIE PARTYCJI - https://wiki.archlinux.org/index.php/Format_a_partition"
   print_info "Na tym etapie wybieramy i formatujemy partycję, na której zostanie zainstalowany Archlinux"
   print_danger "\tWszystkie dane na partycji głównej i SWAP zostaną UTRACONE."
   i=0
@@ -263,9 +263,9 @@ format_partitions(){
 
   # partitions based on boot system
   if [[ $UEFI -eq 1 ]]; then
-    partition_name=("root" "EFI" "swap" "another")
+    partition_name=("root" "EFI" "swap" "inna")
   else
-    partition_name=("root" "swap" "another")
+    partition_name=("root" "swap" "inna")
   fi
 
   select_filesystem(){
@@ -290,7 +290,7 @@ format_partitions(){
   }
 
   format_partition(){
-    read_input_text "Potwierdź formatowanie $1 partycji"
+    read_input_text "Potwierdź formatowanie partycji $1"
     if [[ $OPTION == y ]]; then
       [[ -z $3 ]] && select_filesystem || filesystem=$3
       mkfs.${filesystem} $1 \
@@ -304,7 +304,7 @@ format_partitions(){
   }
 
   format_swap_partition(){
-    read_input_text "Potwierdź formatowanie $1 partycji"
+    read_input_text "Potwierdź formatowanie partycji $1"
     if [[ $OPTION == y ]]; then
       mkswap $1
       swapon $1
@@ -313,7 +313,7 @@ format_partitions(){
   }
 
   create_swap(){
-    swap_options=("partition" "file" "skip");
+    swap_options=("partycja" "plik" "pomiń");
     PS3="$prompt1"
     echo -e "Wybierz ${BYellow}${partition_name[i]}${Reset} system plików:\n"
     select OPT in "${swap_options[@]}"; do
@@ -376,7 +376,7 @@ format_partitions(){
     if [[ ${partition_name[i]} == swap ]]; then
       create_swap
     else
-      echo -e "Wybierz ${BYellow}${partition_name[i]}${Reset} partycję:\n"
+      echo -e "Wybierz partycję ${BYellow}${partition_name[i]}${Reset} :\n"
       select partition in "${partitions_list[@]}"; do
         #get the selected number - 1
         partition_number=$(( $REPLY - 1 ))
@@ -389,7 +389,7 @@ format_partitions(){
               ;;
             EFI)
               set_efi_partition
-              read_input_text "Formatowanie ${partition} partycji"
+              read_input_text "Formatowanie partycji ${partition}"
               if [[ $OPTION == y ]]; then
                 format_partition "${partition}" "${MOUNTPOINT}${EFI_DISK}" vfat
               else
@@ -402,7 +402,7 @@ format_partitions(){
               read -p "Punkt montowania [np: /home]:" directory
               [[ $directory == "/boot" ]] && BOOT_DISK=`echo ${partition} | sed 's/[0-9]//'`
               select_filesystem
-              read_input_text "Formatowanie ${partition} partycji"
+              read_input_text "Formatowanie partycji ${partition}"
               if [[ $OPTION == y ]]; then
                 format_partition "${partition}" "${MOUNTPOINT}${directory}" "${filesystem}"
               else
@@ -533,7 +533,7 @@ configure_hardwareclock(){
 #}}}
 #CONFIGURE LOCALE {{{
 configure_locale(){
-  print_title "LOCALE - https://wiki.archlinux.org/index.php/Locale"
+  print_title "USTAWIENIA REGIONALNE - https://wiki.archlinux.org/index.php/Locale"
   print_info "Ustawienia regionalne w Linuksie są używane w celu określenia, którego języka używa użytkownik. Ponieważ ustawienia regionalne definiują również jakie zestawy znaków są używane, ustawienie poprawnego locale jest szczególnie ważne, jeśli język zawiera znaki spoza ASCII."
   OPTION=n
   while [[ $OPTION != y ]]; do
@@ -561,10 +561,10 @@ install_bootloader(){
   print_warning "\tPartycja główna: ${ROOT_DISK}"
   if [[ $UEFI -eq 1 ]]; then
     print_warning "\tWykryty tryb UEFI"
-    bootloaders_list=("Syslinux" "Gummiboot" "Skip")
+    bootloaders_list=("Syslinux" "Gummiboot" "Pomiń")
   else
     print_warning "\tWykryty tryb BIOS"
-    bootloaders_list=("Syslinux" "Skip")
+    bootloaders_list=("Syslinux" "Pomiń")
   fi
   PS3="$prompt1"
   echo -e "Zainstaluj program rozruchowy:\n"
@@ -595,7 +595,7 @@ configure_bootloader(){
     Syslinux)
       print_title "SYSLINUX - https://wiki.archlinux.org/index.php/Syslinux"
       print_info "Syslinux to zestaw programów rozruchowych umożliwiających rozruch z dysków twardych, CD, oraz poprzez sieć via PXE. Wspiera systemy plików: fat, ext2, ext3, ext4, oraz btrfs."
-      syslinux_install_mode=("[MBR] Automatic" "[PARTITION] Automatic" "Manual")
+      syslinux_install_mode=("[MBR] Automacznie" "[PARTYCJA] Automatycznie" "Ręcznie")
       PS3="$prompt1"
       echo -e "Instalacja Syslinux:\n"
       select OPT in "${syslinux_install_mode[@]}"; do
@@ -623,7 +623,7 @@ configure_bootloader(){
             else
               sed -i "s/sda[0-9]/${ROOT_PART}/g" ${MOUNTPOINT}/boot/syslinux/syslinux.cfg
             fi
-            print_warning "Partycją w pytaniu jest ta, którą masz jako / (root), a nie /boot."
+            print_warning "Partycją w pytaniu jest tą, którą masz ustawioną jako / (root), a nie /boot."
             pause_function
             $EDITOR ${MOUNTPOINT}/boot/syslinux/syslinux.cfg
             break
@@ -708,21 +708,21 @@ while true
 do
   print_title "ARCHLINUX ULTIMATE INSTALL - https://github.com/helmuthdu/aui"
   echo " 1) $(mainmenu_item "${checklist[1]}" "Wybierz Mapę Znaków")"
-  echo " 2) $(mainmenu_item "${checklist[2]}" "Select Editor")"
-  echo " 3) $(mainmenu_item "${checklist[3]}" "Configure Mirrorlist")"
-  echo " 4) $(mainmenu_item "${checklist[4]}" "Create Partition")"
-  echo " 5) $(mainmenu_item "${checklist[5]}" "Select|Format Partiton")"
-  echo " 6) $(mainmenu_item "${checklist[6]}" "Install Base System")"
-  echo " 7) $(mainmenu_item "${checklist[7]}" "Configure Fstab")"
-  echo " 8) $(mainmenu_item "${checklist[8]}" "Configure Hostname")"
-  echo " 9) $(mainmenu_item "${checklist[9]}" "Configure Timezone")"
-  echo "10) $(mainmenu_item "${checklist[10]}" "Configure Hardware Clock")"
-  echo "11) $(mainmenu_item "${checklist[11]}" "Configure Locale")"
-  echo "12) $(mainmenu_item "${checklist[12]}" "Configure Mkinitcpio")"
-  echo "13) $(mainmenu_item "${checklist[13]}" "Install Bootloader")"
-  echo "14) $(mainmenu_item "${checklist[14]}" "Root Password")"
+  echo " 2) $(mainmenu_item "${checklist[2]}" "Wybierz Edytor")"
+  echo " 3) $(mainmenu_item "${checklist[3]}" "Konfiguruj Listę Serwerów Lustrzanych")"
+  echo " 4) $(mainmenu_item "${checklist[4]}" "Tworzenie Partycji")"
+  echo " 5) $(mainmenu_item "${checklist[5]}" "Wybór|Formatowanie Partycji")"
+  echo " 6) $(mainmenu_item "${checklist[6]}" "Instalacja Systemu Bazowego")"
+  echo " 7) $(mainmenu_item "${checklist[7]}" "Konfiguracja Fstab")"
+  echo " 8) $(mainmenu_item "${checklist[8]}" "Konfiguracja Nazwy Hosta")"
+  echo " 9) $(mainmenu_item "${checklist[9]}" "Konfiguracja Strefy Czasowej")"
+  echo "10) $(mainmenu_item "${checklist[10]}" "Konfiguracja Zegar Sprzętowy")"
+  echo "11) $(mainmenu_item "${checklist[11]}" "Konfiguracja Locale")"
+  echo "12) $(mainmenu_item "${checklist[12]}" "Konfiguracja Mkinitcpio")"
+  echo "13) $(mainmenu_item "${checklist[13]}" "Instalacja Bootloader")"
+  echo "14) $(mainmenu_item "${checklist[14]}" "Hasło Administratora")"
   echo ""
-  echo " d) Done"
+  echo " d) Gotowe"
   echo ""
   read_input_options
   for OPT in ${OPTIONS[@]}; do
