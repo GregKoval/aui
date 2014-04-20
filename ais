@@ -465,7 +465,7 @@ configure_fstab(){
   fi
 
   PS3="$prompt1"
-  echo -e "Konfiguruj fstab bazujący na:"
+  echo -e "Konfiguruj fstab bazując na:"
   select OPT in "${fstab_list[@]}"; do
     case "$REPLY" in
       1) genfstab -p ${MOUNTPOINT} >> ${MOUNTPOINT}/etc/fstab ;;
@@ -515,7 +515,7 @@ configure_timezone(){
 #}}}
 #CONFIGURE HARDWARECLOCK {{{
 configure_hardwareclock(){
-  print_title "HARDWARE CLOCK TIME - https://wiki.archlinux.org/index.php/Internationalization"
+  print_title "CZAS ZEGARA SPRZĘTOWEGO - https://wiki.archlinux.org/index.php/Internationalization"
   print_info "Jest on ustawiany w /etc/adjtime. Ustaw tryb zegara sprzętowego, aby ujednolicić czas między systemami operacyjnymi na tym samym sprzęcie. W innym przypadku, mogą one nadpisywać czas i powodować zmiany zegara (może to powodować, że korekta zmiany czasu może być rozregulowana)."
   hwclock_list=('UTC' 'Localtime');
   PS3="$prompt1"
@@ -556,7 +556,7 @@ configure_mkinitcpio(){
 #}}}
 #INSTALL BOOTLOADER {{{
 install_bootloader(){
-  print_title "BOOTLOADER - https://wiki.archlinux.org/index.php/Bootloader"
+  print_title "PROGRAM ROZRUCHOWY - https://wiki.archlinux.org/index.php/Bootloader"
   print_info "Program rozruchowy jest odpowiedzialny za ładowanie jądra i initial RAM disk przed rozpoczęciem procesu rozruchu."
   print_warning "\tPartycja główna: ${ROOT_DISK}"
   if [[ $UEFI -eq 1 ]]; then
@@ -595,7 +595,7 @@ configure_bootloader(){
     Syslinux)
       print_title "SYSLINUX - https://wiki.archlinux.org/index.php/Syslinux"
       print_info "Syslinux to zestaw programów rozruchowych umożliwiających rozruch z dysków twardych, CD, oraz poprzez sieć via PXE. Wspiera systemy plików: fat, ext2, ext3, ext4, oraz btrfs."
-      syslinux_install_mode=("[MBR] Automacznie" "[PARTYCJA] Automatycznie" "Ręcznie")
+      syslinux_install_mode=("[MBR] Automatic" "[PARTITION] Automatic" "Manual")
       PS3="$prompt1"
       echo -e "Instalacja Syslinux:\n"
       select OPT in "${syslinux_install_mode[@]}"; do
@@ -630,7 +630,7 @@ configure_bootloader(){
             ;;
           3)
             print_info "Twoja partycja rozruchowa, na której masz zamiar zainstalować Syslinux, musi być zbudowana na systemie plików FAT, ext2, ext3, ext4, albo Btrfs. Należy zainstalować go na zamontowanym katalogu, a nie partycji /dev/sdXY. Nie musisz instalować go w katalogu głównym systemu plików, np. z partycją       /dev/sda1 zamontowaną w /boot możesz zainstalować Syslinux w katalogu syslinuksa"
-            echo -e $prompt3
+            echo -e $prompt[3
             print_warning "mkdir /boot/syslinux\nextlinux --install /boot/syslinux "
             arch-chroot ${MOUNTPOINT}
             break
@@ -707,9 +707,9 @@ pacman -Sy
 while true
 do
   print_title "ARCHLINUX ULTIMATE INSTALL - https://github.com/helmuthdu/aui"
-  echo " 1) $(mainmenu_item "${checklist[1]}" "Wybierz Mapę Znaków")"
-  echo " 2) $(mainmenu_item "${checklist[2]}" "Wybierz Edytor")"
-  echo " 3) $(mainmenu_item "${checklist[3]}" "Konfiguruj Listę Serwerów Lustrzanych")"
+  echo " 1) $(mainmenu_item "${checklist[1]}" "Wybór Mapy Znaków")"
+  echo " 2) $(mainmenu_item "${checklist[2]}" "Wybór Edytora")"
+  echo " 3) $(mainmenu_item "${checklist[3]}" "Konfigurjacja Listy Serwerów Lustrzanych")"
   echo " 4) $(mainmenu_item "${checklist[4]}" "Tworzenie Partycji")"
   echo " 5) $(mainmenu_item "${checklist[5]}" "Wybór|Formatowanie Partycji")"
   echo " 6) $(mainmenu_item "${checklist[6]}" "Instalacja Systemu Bazowego")"
