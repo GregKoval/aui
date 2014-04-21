@@ -42,9 +42,9 @@
     BWhite=${Bold}$(tput setaf 7)
   #}}}
   # PROMPT {{{
-    prompt1="Enter your option: "
-    prompt2="Enter n° of options (ex: 1 2 3 or 1-3): "
-    prompt3="You have to manual enter the following commands, then press ${BYellow}ctrl+d${Reset} or type ${BYellow}exit${Reset}:"
+    prompt1="Wybierz opcję: "
+    prompt2="Wubierz nr opcji (np: 1 2 3 or 1-3): "
+    prompt3="Musisz ręcznie wpisać następujące polecenie, a następnie wcisnąć ${BYellow}ctrl+d${Reset} albo wpisać ${BYellow}exit${Reset}:"
   #}}}
   # EDITOR {{{
     AUTOMATIC_MODE=0
@@ -125,7 +125,7 @@
           cecho failed
           echo -e "$PKG" >> $PKG_FAIL
           tail -n 15 $LOG
-          read -p "ERROR! Continue install [y/N]?" OPTION
+          read -p "BŁĄD! Kontynuować instalację [y/N]?" OPTION
           [[ $OPTION != y ]] && exit 1
         fi
         break
@@ -144,36 +144,36 @@
         mount -t efivarfs efivarfs /sys/firmware/efi/efivars
       fi
       UEFI=1
-      echo "UEFI Mode detected"
+      echo "Tryb UEFI wykryty"
     else
       UEFI=0
-      echo "BIOS Mode detected"
+      echo "Tryb BIOS wykryty"
     fi
   }
   #}}}
   check_root() { #{{{
     if [[ "$(id -u)" != "0" ]]; then
-      error_msg "ERROR! You must execute the script as the 'root' user."
+      error_msg "BŁĄD! Musisz wykonać skrypt jako 'root'."
     fi
   } #}}}
   check_user() { #{{{
     if [[ "$(id -u)" == "0" ]]; then
-      error_msg "ERROR! You must execute the script as a normal user."
+      error_msg "BŁĄD! Musisz wykonać skrypt jako zwykły użytkownik."
     fi
   } #}}}
   check_archlinux() { #{{{
     if [[ ! -e /etc/arch-release ]]; then
-      error_msg "ERROR! You must execute the script on Arch Linux."
+      error_msg "BŁĄD! Musisz wykonać skrypt w Arch Linux."
     fi
   } #}}}
   check_hostname() { #{{{
     if [[ `echo ${HOSTNAME} | sed 's/ //g'` == "" ]]; then
-      error_msg "ERROR! Hostname is not configured."
+      error_msg "BŁĄD! Nazwa hosta nie jest skonfigurowana."
     fi
   } #}}}
   check_pacman_blocked() { #{{{
     if [[ -f /var/lib/pacman/db.lck ]]; then
-      error_msg "ERROR! Pacman is blocked. \nIf not running remove /var/lib/pacman/db.lck."
+      error_msg "BŁĄD! Pacman jest zablokowany. \nJeśli się nie uruchamia usuń /var/lib/pacman/db.lck."
     fi
   } #}}}
   check_domainname() { #{{{
@@ -186,7 +186,7 @@
 
     # OK, give up.
     if [[ "${DOMAINNAME}" == "" ]]; then
-      error_msg "ERROR! Domain name is not configured."
+      error_msg "BŁĄD! Nazwa domeny nie jest skonfigurowana."
     fi
   } #}}}
   check_connection(){ #{{{
@@ -197,8 +197,8 @@
     WIRED_DEV=`ip link | grep enp | awk '{print $2}'| sed 's/://' | sed '1!d'`
     WIRELESS_DEV=`ip link | grep wlp | awk '{print $2}'| sed 's/://' | sed '1!d'`
     if connection_test; then
-      print_warning "ERROR! Connection not Found."
-      print_info "Network Setup"
+      print_warning "BŁĄD! Nie wykryto połączenia."
+      print_info "Ustawienia sieci"
       conn_type_list=("Wired Automatic" "Wired Manual" "Wireless" "Skip")
       PS3="$prompt1"
       select CONNECTION_TYPE in "${conn_type_list[@]}"; do
@@ -232,7 +232,7 @@
         esac
       done
       if [[ $XPINGS -gt 2 ]]; then
-        print_warning "Can't establish connection. exiting..."
+        print_warning "Nie można ustanowić połączenia. wychodzenie..."
         exit 1
       fi
       [[ $REPLY -ne 4 ]] && check_connection
@@ -252,7 +252,7 @@
       VIDEO_DRIVER="bumblebee"
     elif [[ -n $(echo ${VGA} | grep "nvidia") || -f /sys/kernel/debug/dri/0/vbios.rom ]]; then
       cecho Nvidia
-      read_input_text "Install NVIDIA proprietary driver" $PROPRIETARY_DRIVER
+      read_input_text "Zainstaluj własnościowe sterowniki NVIDIA" $PROPRIETARY_DRIVER
       if [[ $OPTION == y ]]; then
         VIDEO_DRIVER="nvidia"
       else
@@ -260,7 +260,7 @@
       fi
     elif [[ -n $(echo ${VGA} | grep "advanced micro devices") || -f /sys/kernel/debug/dri/0/radeon_pm_info || -f /sys/kernel/debug/dri/0/radeon_sa_info ]]; then
       cecho AMD/ATI
-      read_input_text "Install ATI proprietary driver" $PROPRIETARY_DRIVER
+      read_input_text "Zainstaluj własnościowe sterowniki ATI" $PROPRIETARY_DRIVER
       if [[ $OPTION == y ]]; then
         VIDEO_DRIVER="catalyst"
       else
@@ -274,9 +274,9 @@
       VIDEO_DRIVER="vesa"
     fi
     OPTION="y"
-    [[ $VIDEO_DRIVER == intel || $VIDEO_DRIVER == vesa ]] && read -p "Confirm video driver: $VIDEO_DRIVER [Y/n]" OPTION
+    [[ $VIDEO_DRIVER == intel || $VIDEO_DRIVER == vesa ]] && read -p "Potwierdź sterownik graficzny: $VIDEO_DRIVER [Y/n]" OPTION
     if [[ $OPTION == n ]]; then
-      read -p "Type your video driver [ex: sis, fbdev, modesetting]: " VIDEO_DRIVER
+      read -p "Wpisz nazwę sterownika graficznego [np: sis, fbdev, modesetting]: " VIDEO_DRIVER
     fi
   } #}}}
   read_input() { #{{{
@@ -447,7 +447,7 @@
         if [[ $VERBOSE_MODE -eq 0 ]]; then
           cecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} Installing ${AUR} ${Bold}${PKG}${Reset} success"
         else
-          echo -e "Warning: ${PKG} is up to date --skipping"
+          echo -e "Uwaga: ${PKG} jest aktualne --pominięcie"
         fi
       fi
     done
@@ -535,13 +535,13 @@
   } #}}}
   invalid_option() { #{{{
     print_line
-    echo "Invalid option. Try another one."
+    echo "Niepoprawna opcja. Spróbuj innej."
     pause_function
   } #}}}
   pause_function() { #{{{
     print_line
     if [[ $AUTOMATIC_MODE -eq 0 ]]; then
-      read -e -sn 1 -p "Press enter to continue..."
+      read -e -sn 1 -p "Wciśnij enter aby kontynuować..."
     fi
   } #}}}
   menu_item() { #{{{
@@ -565,7 +565,7 @@
     local _GROUP=${2}
 
     if [[ -z ${_GROUP} ]]; then
-      error_msg "ERROR! 'add_user_to_group' was not given enough parameters."
+      error_msg "Uwaga! 'add_user_to_group' nie ma poprawnych parametrów."
     fi
 
     ncecho " ${BBlue}[${Reset}${Bold}X${BBlue}]${Reset} Adding ${Bold}${_USER}${Reset} to ${Bold}${_GROUP}${Reset} "
@@ -587,7 +587,7 @@
   getkeymap() { #{{{
     local keymaps=(`localectl list-keymaps`)
     PS3="(shift+pgup/pgdown) $prompt1"
-    echo "Select keymap:"
+    echo "Wybierz mapę znaków:"
     select KEYMAP in "${keymaps[@]}"; do
       if contains_element "$KEYMAP" "${keymaps[@]}"; then
         break
@@ -600,7 +600,7 @@
   setlocale() { #{{{
     local locale_list=(`cat /etc/locale.gen | grep UTF-8 | sed 's/\..*$//' | sed '/@/d' | awk '{print $1}' | uniq | sed 's/#//g'`);
     PS3="$prompt1"
-    echo "Select locale:"
+    echo "Wybierz locale:"
     select LOCALE in "${locale_list[@]}"; do
       if contains_element "$LOCALE" "${locale_list[@]}"; then
         LOCALE_UTF8="${LOCALE}.UTF-8"
@@ -614,12 +614,12 @@
   settimezone() { #{{{
     local zone=(`timedatectl list-timezones | sed 's/\/.*$//' | uniq`);
     PS3="$prompt1"
-    echo "Select zone:"
+    echo "Wybierz strefę czasową:"
     select ZONE in "${zone[@]}"; do
       if contains_element "$ZONE" "${zone[@]}"; then
         local subzone=(`timedatectl list-timezones | grep ${ZONE} | sed 's/^.*\///'`)
         PS3="$prompt1"
-        echo "Select subzone:"
+        echo "Wybierz międzystrefę:"
         select SUBZONE in "${subzone[@]}"; do
           if contains_element "$SUBZONE" "${subzone[@]}"; then
             break
